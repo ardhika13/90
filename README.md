@@ -18,14 +18,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $waktu = $_POST["waktu"];
     $uraian = $_POST["uraian"];
 
-    // Query untuk menambahkan data ke tabel kegiatan
-    $sql = "INSERT INTO kegiatan (`Waktu`, `Uraian Kegiatan`) VALUES ('$waktu', '$uraian')";
+    // Menggunakan prepared statements untuk menghindari SQL Injection
+    $stmt = $conn->prepare("INSERT INTO kegiatan (`Waktu`, `Uraian Kegiatan`) VALUES (?, ?)");
+    $stmt->bind_param("ss", $waktu, $uraian);  // Mengikat parameter
 
-    if ($conn->query($sql) === TRUE) {
+    if ($stmt->execute()) {
         echo "<p class='success-message'>Data berhasil ditambahkan</p>";
     } else {
-        echo "<p class='error-message'>Error: " . $sql . "<br>" . $conn->error . "</p>";
+        echo "<p class='error-message'>Error: " . $stmt->error . "</p>";
     }
+
+    $stmt->close();  // Menutup statement
 }
 ?>
 
